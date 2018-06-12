@@ -1,9 +1,12 @@
 import cv2
 import os, sys
 import time, datetime
+import serial
 
 WEBCAM_DEVICE = 0
 STORAGE_DIR = 'storage'
+
+ArduinoUnoSerial = serial.Serial('/dev/ttyACM1', 9600)
 
 def putText(img, text, location, positive=True):
 
@@ -40,7 +43,7 @@ if __name__ == '__main__':
         cv2.imshow(screen, img_ui)
         keypress = cv2.waitKey(10)
 
-        if keypress == 32: # space: take photo
+        if ArduinoUnoSerial.read(1) == b'1': # serial read 1: take photo
             # take snapshot, wait for user input
             img_ui = img.copy()
             putText(img_ui, "SALVAR", 'left_button', True)
@@ -48,7 +51,7 @@ if __name__ == '__main__':
             cv2.imshow(screen, img_ui)
             keypress = cv2.waitKey(0)
 
-            if keypress == 32: # space: print
+            if ArduinoUnoSerial.read(1) == b'1': # serial read 1: print
 
                 datestr = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                 filename = os.path.join(os.getcwd(), STORAGE_DIR, datestr + ".jpg")
@@ -63,5 +66,5 @@ if __name__ == '__main__':
             else:
                 continue # retake
 
-        if keypress == 27: # ESC: exit
+        if ArduinoUnoSerial.read(1) == b'2': # serial read 2: exit
             break
